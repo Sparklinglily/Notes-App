@@ -124,8 +124,11 @@ service cloud.firestore {
 
 ## Step 1: Clone the Repository
 
+```bash
 git clone <your-repository-url>
+
 cd notes_app
+```
 
 ## Step 2: Install Dependencies 
 
