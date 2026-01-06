@@ -43,3 +43,22 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+
+# Firebase
+**/google-services.json
+**/GoogleService-Info.plist
+**/.firebase/
+**/firebase_options.dart
+lib/firebase_options.dart
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Coverage
+coverage/
+
+# Test related
+test/.test_coverage.dart
