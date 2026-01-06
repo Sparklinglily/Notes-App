@@ -169,6 +169,8 @@ flutter pub get
 ```bash
 flutter doctor
 
+flutter pub get
+
 flutter run
 
 flutter build apk --release
