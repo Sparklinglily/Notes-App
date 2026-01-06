@@ -167,14 +167,12 @@ flutter pub get
 ## Step 4: Run the App
 
 ```bash
-
 flutter doctor
 
 flutter run
 
 flutter build apk --release
-
-```bash
+```
 
 The APK will be located at: build/app/outputs/flutter-apk/app-release.apk
 
@@ -235,7 +233,7 @@ The APK will be located at: build/app/outputs/flutter-apk/app-release.apk
 
 flutter build apk --debug
 
-```bash
+```
 
 ### Release APK (Recommended for submission)
 
@@ -243,7 +241,7 @@ flutter build apk --debug
 
 flutter build apk --release
 
-```bash
+```
 
 The APK will be at: build/app/outputs/flutter-apk/app-release.apk
 
