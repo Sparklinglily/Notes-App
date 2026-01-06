@@ -109,8 +109,9 @@ service cloud.firestore {
 
 ## Firebase Authentication
 
-Email/Password authentication enabled for both login ad sign up
-User sessions persisted automatically by Firebase
+- Email/Password authentication enabled for both login and sign up
+
+- User sessions persisted automatically by Firebase
 
 ## Setup Instructions
 
