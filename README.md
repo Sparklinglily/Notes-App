@@ -245,7 +245,6 @@ flutter build apk --release
 
 ```
 
-The APK will be at: build/app/outputs/flutter-apk/app-release.apk
 
 ## Code Quality
 
@@ -269,8 +268,8 @@ The APK will be at: build/app/outputs/flutter-apk/app-release.apk
 - Clean state updates
 
 
-## Developed with Clean Architecture, MVVM, and Riverpod Firebase
-## Auth & Firestore Backend Material Design 3 UI
+## Developed with Clean Architecture, MVVM, and Riverpod 
+## Firebase Auth & Firestore Backend and Material Design 3 UI
 
 
 
