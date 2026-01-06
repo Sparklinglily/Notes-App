@@ -132,7 +132,9 @@ cd notes_app
 
 ## Step 2: Install Dependencies 
 
+```bash
 flutter pub get
+```
 
 ## Step 3: Firebase Configuration
 
@@ -172,8 +174,6 @@ flutter pub get
 
 ```bash
 flutter doctor
-
-flutter pub get
 
 flutter run
 
