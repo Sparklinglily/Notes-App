@@ -5,14 +5,14 @@ import 'package:note_app/domain/repository/auth_repository.dart';
 import 'package:note_app/domain/repository/notes_repository.dart';
 
 class NotesRepositoryImpl implements NotesRepository {
-  final FirebaseNotesService dataSource;
+  final FirebaseNotesService fbNoteService;
 
-  NotesRepositoryImpl(this.dataSource);
+  NotesRepositoryImpl(this.fbNoteService);
 
   @override
   Stream<Either<Failure, List<Note>>> getNotes(String userId) {
     try {
-      return dataSource
+      return fbNoteService
           .getNotes(userId)
           .map((noteModels) {
             final notes = noteModels.map((model) => model.toEntity()).toList();
@@ -35,7 +35,7 @@ class NotesRepositoryImpl implements NotesRepository {
     required String userId,
   }) async {
     try {
-      final noteModel = await dataSource.createNote(
+      final noteModel = await fbNoteService.createNote(
         title: title,
         content: content,
         userId: userId,
@@ -53,7 +53,7 @@ class NotesRepositoryImpl implements NotesRepository {
     required String content,
   }) async {
     try {
-      final noteModel = await dataSource.updateNote(
+      final noteModel = await fbNoteService.updateNote(
         id: id,
         title: title,
         content: content,
@@ -67,7 +67,7 @@ class NotesRepositoryImpl implements NotesRepository {
   @override
   Future<Either<Failure, void>> deleteNote(String id) async {
     try {
-      await dataSource.deleteNote(id);
+      await fbNoteService.deleteNote(id);
       return const Either.right(null);
     } catch (e) {
       return Either.left(ServerFailure(e.toString()));

@@ -18,7 +18,7 @@ class AddEditNoteScreen extends ConsumerStatefulWidget {
 }
 
 class _AddEditNoteScreenState extends ConsumerState<AddEditNoteScreen> {
-  final _formKey = GlobalKey<FormState>();
+  final notesFormKey = GlobalKey<FormState>();
   late final TextEditingController titleController;
   late final TextEditingController contentController;
 
@@ -38,8 +38,8 @@ class _AddEditNoteScreenState extends ConsumerState<AddEditNoteScreen> {
     super.dispose();
   }
 
-  Future<void> _handleSave() async {
-    if (_formKey.currentState!.validate()) {
+  Future<void> handleSave() async {
+    if (notesFormKey.currentState!.validate()) {
       final notifier = ref.read(notesViewModelProvider.notifier);
 
       final bool success;
@@ -104,7 +104,7 @@ class _AddEditNoteScreenState extends ConsumerState<AddEditNoteScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: notesState.isLoading ? null : _handleSave,
+            onPressed: notesState.isLoading ? null : handleSave,
             child:
                 notesState.isLoading
                     ? const SizedBox(
@@ -129,7 +129,7 @@ class _AddEditNoteScreenState extends ConsumerState<AddEditNoteScreen> {
         ],
       ),
       body: Form(
-        key: _formKey,
+        key: notesFormKey,
         child: ListView(
           padding: const EdgeInsets.all(24),
           children: [
@@ -149,7 +149,7 @@ class _AddEditNoteScreenState extends ConsumerState<AddEditNoteScreen> {
               validator: Validators.validateContent,
               prefixIcon: const Padding(
                 padding: EdgeInsets.only(bottom: 180),
-                child: Icon(Icons.notes),
+                child: Icon(Icons.note_alt, color: AppColors.textSecondary),
               ),
             ),
             const SizedBox(height: 32),

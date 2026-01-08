@@ -12,7 +12,7 @@ class NoteDetailScreen extends ConsumerWidget {
 
   const NoteDetailScreen({super.key, required this.note});
 
-  void _showDeleteDialog(BuildContext context, WidgetRef ref) {
+  void showDeleteDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -97,7 +97,7 @@ class NoteDetailScreen extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.delete, color: AppColors.error),
-            onPressed: () => _showDeleteDialog(context, ref),
+            onPressed: () => showDeleteDialog(context, ref),
             tooltip: AppStrings.delete,
           ),
         ],

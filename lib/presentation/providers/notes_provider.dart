@@ -7,7 +7,7 @@ import 'package:note_app/domain/entities/note.dart';
 import 'package:note_app/domain/use_cases/note_use_case/create_note.dart';
 import 'package:note_app/domain/use_cases/note_use_case/delete_note.dart';
 import 'package:note_app/domain/use_cases/note_use_case/get_notes.dart';
-import 'package:note_app/domain/use_cases/note_use_case/search_notes_usecace.dart';
+import 'package:note_app/domain/use_cases/note_use_case/search_notes_usecase.dart';
 import 'package:note_app/domain/use_cases/note_use_case/update_note.dart';
 import 'package:riverpod/legacy.dart';
 
@@ -25,7 +25,7 @@ final uuidProvider = Provider<Uuid>((ref) {
 final firebaseNotesDataSourceProvider = Provider<FirebaseNotesService>((ref) {
   final firestore = ref.watch(firestoreProvider);
   final uuid = ref.watch(uuidProvider);
-  return FirebaseNotesDataSourceImpl(firestore, uuid);
+  return FirebaseNotesServiceImpl(firestore, uuid);
 });
 
 final notesRepositoryProvider = Provider((ref) {
@@ -111,14 +111,14 @@ class NotesState {
 
 // Notes view model
 class NotesViewModel extends StateNotifier<NotesState> {
-  final CreateNoteUseCase _createNoteUseCase;
-  final UpdateNoteUseCase _updateNoteUseCase;
-  final DeleteNoteUseCase _deleteNoteUseCase;
+  final CreateNoteUseCase createNoteUseCase;
+  final UpdateNoteUseCase updateNoteUseCase;
+  final DeleteNoteUseCase deleteNoteUseCase;
 
   NotesViewModel(
-    this._createNoteUseCase,
-    this._updateNoteUseCase,
-    this._deleteNoteUseCase,
+    this.createNoteUseCase,
+    this.updateNoteUseCase,
+    this.deleteNoteUseCase,
   ) : super(NotesState());
 
   Future<bool> createNote({
@@ -128,7 +128,7 @@ class NotesViewModel extends StateNotifier<NotesState> {
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
-    final result = await _createNoteUseCase(
+    final result = await createNoteUseCase(
       title: title,
       content: content,
       userId: userId,
@@ -156,7 +156,7 @@ class NotesViewModel extends StateNotifier<NotesState> {
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
-    final result = await _updateNoteUseCase(
+    final result = await updateNoteUseCase(
       id: id,
       title: title,
       content: content,
@@ -180,7 +180,7 @@ class NotesViewModel extends StateNotifier<NotesState> {
   Future<bool> deleteNote(String id) async {
     state = state.copyWith(isLoading: true, error: null);
 
-    final result = await _deleteNoteUseCase(id);
+    final result = await deleteNoteUseCase(id);
 
     return result.fold(
       (failure) {

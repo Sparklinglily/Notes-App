@@ -11,88 +11,47 @@ class SplashScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authStateProvider);
-
-    return authState.when(
-      data: (user) {
-        // Navigate based on auth state
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder:
-                  (context) =>
-                      user != null
-                          ? const NotesListScreen()
-                          : const LoginScreen(),
-            ),
-          );
+    ref.listen(authStateProvider, (previous, next) {
+      next.whenData((user) {
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          if (context.mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder:
+                    (context) =>
+                        user != null
+                            ? const NotesListScreen()
+                            : const LoginScreen(),
+              ),
+            );
+          }
         });
+      });
+    });
 
-        return const Scaffold(
-          backgroundColor: AppColors.background,
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.note_alt_outlined,
-                  size: 80,
-                  color: AppColors.primary,
-                ),
-                SizedBox(height: 24),
-                Text(
-                  AppStrings.appName,
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                SizedBox(height: 32),
-                CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-      loading:
-          () => const Scaffold(
-            backgroundColor: AppColors.background,
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.note_alt_outlined,
-                    size: 80,
-                    color: AppColors.primary,
-                  ),
-                  SizedBox(height: 24),
-                  Text(
-                    AppStrings.appName,
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  SizedBox(height: 32),
-                  CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primary,
-                    ),
-                  ),
-                ],
+    return const Scaffold(
+      backgroundColor: AppColors.background,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.note_alt_outlined, size: 80, color: AppColors.primary),
+            SizedBox(height: 24),
+            Text(
+              AppStrings.appName,
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
               ),
             ),
-          ),
-      error:
-          (_, __) => const Scaffold(
-            backgroundColor: AppColors.background,
-            body: Center(child: Text('An error occurred')),
-          ),
+            SizedBox(height: 32),
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

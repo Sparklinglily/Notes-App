@@ -29,49 +29,49 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     super.dispose();
   }
 
-  Future<void> _handleSignup() async {
-    if (isSignUpNavigating) return;
-    // Clear any previous errors
+  Future<void> handleSignup() async {
     ref.read(authViewModelProvider.notifier).clearError();
 
     if (signUpFormKey.currentState!.validate()) {
-      final success = await ref
+      await ref
           .read(authViewModelProvider.notifier)
           .signUp(
             signUpEmailController.text.trim(),
             signUpPasswordController.text,
           );
-
-      if (mounted && !isSignUpNavigating) {
-        if (success) {
-          isSignUpNavigating = true;
-          // Navigate to notes list on success
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const NotesListScreen()),
-          );
-        } else {
-          // Show error message
-          final error = ref.read(authViewModelProvider).error;
-          if (error != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(error),
-                backgroundColor: AppColors.error,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            );
-          }
-        }
-      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authViewModelProvider);
+    final isLoading = ref.watch(
+      authViewModelProvider.select((s) => s.isLoading),
+    );
+
+    ref.listen(authViewModelProvider.select((s) => s.error), (previous, error) {
+      if (error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      }
+    });
+
+    ref.listen(authStateProvider, (previous, next) {
+      next.whenData((user) {
+        if (user != null && mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const NotesListScreen()),
+          );
+        }
+      });
+    });
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -85,7 +85,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // App Icon
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -100,7 +99,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Welcome Text
                   const Text(
                     AppStrings.createYourAccount,
                     style: TextStyle(
@@ -121,19 +119,17 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ),
                   const SizedBox(height: 48),
 
-                  // Email Field
                   CustomTextField(
                     controller: signUpEmailController,
                     label: AppStrings.email,
                     hint: AppStrings.enterEmail,
-                    obscureText: true,
+
                     keyboardType: TextInputType.emailAddress,
                     validator: Validators.validateEmail,
                     prefixIcon: const Icon(Icons.email_outlined),
                   ),
                   const SizedBox(height: 20),
 
-                  // Password Field
                   CustomTextField(
                     controller: signUpPasswordController,
                     label: AppStrings.password,
@@ -156,9 +152,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Signup Button
                   ElevatedButton(
-                    onPressed: authState.isLoading ? null : _handleSignup,
+                    onPressed: isLoading ? null : handleSignup,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.secondary,
                       foregroundColor: Colors.white,
@@ -172,7 +167,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       ),
                     ),
                     child:
-                        authState.isLoading
+                        isLoading
                             ? const SizedBox(
                               height: 20,
                               width: 20,
@@ -193,7 +188,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Login Link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -206,7 +200,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       ),
                       TextButton(
                         onPressed:
-                            authState.isLoading
+                            isLoading
                                 ? null
                                 : () {
                                   Navigator.of(context).pushReplacement(

@@ -29,49 +29,94 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
-    if (isNavigating) return;
-    // Clear any previous errors
+  // Future<void> handleLogin() async {
+  //   if (isNavigating) return;
+  //   // Clear any former errors
+  //   ref.read(authViewModelProvider.notifier).clearError();
+
+  //   if (loginFormKey.currentState!.validate()) {
+  //     final success = await ref
+  //         .read(authViewModelProvider.notifier)
+  //         .login(
+  //           loginEmailController.text.trim(),
+  //           loginPasswordController.text,
+  //         );
+
+  //     if (mounted && !isNavigating) {
+  //       if (success) {
+  //         isNavigating = true;
+  //         // Navigate to notes list screen u success
+  //         Navigator.of(context).pushReplacement(
+  //           MaterialPageRoute(builder: (context) => const NotesListScreen()),
+  //         );
+  //       } else {
+  //         // Show error message
+  //         final error = ref.read(authViewModelProvider).error;
+  //         if (error != null) {
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             SnackBar(
+  //               content: Text(error),
+  //               backgroundColor: AppColors.error,
+  //               behavior: SnackBarBehavior.floating,
+  //               shape: RoundedRectangleBorder(
+  //                 borderRadius: BorderRadius.circular(8),
+  //               ),
+  //             ),
+  //           );
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   final authState = ref.watch(authViewModelProvider);
+  Future<void> handleLogin() async {
     ref.read(authViewModelProvider.notifier).clearError();
 
     if (loginFormKey.currentState!.validate()) {
-      final success = await ref
+      await ref
           .read(authViewModelProvider.notifier)
           .login(
             loginEmailController.text.trim(),
             loginPasswordController.text,
           );
-
-      if (mounted && !isNavigating) {
-        if (success) {
-          isNavigating = true;
-          // Navigate to notes list on success
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const NotesListScreen()),
-          );
-        } else {
-          // Show error message
-          final error = ref.read(authViewModelProvider).error;
-          if (error != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(error),
-                backgroundColor: AppColors.error,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            );
-          }
-        }
-      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authViewModelProvider);
+    final isLoading = ref.watch(
+      authViewModelProvider.select((s) => s.isLoading),
+    );
+
+    // Listen for errors
+    ref.listen(authViewModelProvider.select((s) => s.error), (previous, error) {
+      if (error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      }
+    });
+
+    // Listen for successful login (user will no longer be null)
+    ref.listen(authStateProvider, (previous, next) {
+      next.whenData((user) {
+        if (user != null && mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const NotesListScreen()),
+          );
+        }
+      });
+    });
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -100,7 +145,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Welcome Text
                   const Text(
                     AppStrings.welcomeBack,
                     style: TextStyle(
@@ -121,7 +165,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 48),
 
-                  // Email Field
                   CustomTextField(
                     controller: loginEmailController,
                     label: AppStrings.email,
@@ -132,7 +175,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Password Field
                   CustomTextField(
                     controller: loginPasswordController,
                     label: AppStrings.password,
@@ -155,9 +197,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Login Button
                   ElevatedButton(
-                    onPressed: authState.isLoading ? null : _handleLogin,
+                    onPressed: isLoading ? null : handleLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
@@ -171,7 +212,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                     child:
-                        authState.isLoading
+                        isLoading
                             ? const SizedBox(
                               height: 20,
                               width: 20,
@@ -192,7 +233,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Sign Up Link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -205,7 +245,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       TextButton(
                         onPressed:
-                            authState.isLoading
+                            isLoading
                                 ? null
                                 : () {
                                   Navigator.of(context).pushReplacement(

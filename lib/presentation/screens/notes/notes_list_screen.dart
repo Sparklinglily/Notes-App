@@ -27,7 +27,7 @@ class _NotesListScreenState extends ConsumerState<NotesListScreen> {
     super.dispose();
   }
 
-  void _handleLogout() async {
+  void handleLogout() async {
     await ref.read(authViewModelProvider.notifier).logout();
     if (mounted) {
       Navigator.of(context).pushReplacement(
@@ -69,14 +69,13 @@ class _NotesListScreenState extends ConsumerState<NotesListScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.logout, color: AppColors.error),
-                onPressed: _handleLogout,
+                onPressed: handleLogout,
                 tooltip: AppStrings.logout,
               ),
             ],
           ),
           body: Column(
             children: [
-              // Search bar
               Container(
                 padding: const EdgeInsets.all(16),
                 color: AppColors.surface,
@@ -112,7 +111,7 @@ class _NotesListScreenState extends ConsumerState<NotesListScreen> {
                   ),
                 ),
               ),
-              // Notes list
+
               Expanded(
                 child:
                     filteredNotes.isEmpty

@@ -9,10 +9,10 @@ abstract class FirebaseAuthService {
   Stream<UserModel?> get authStateChanges;
 }
 
-class FirebaseAuthDataSourceImpl implements FirebaseAuthService {
-  final FirebaseAuth _firebaseAuth;
+class FirebaseAuthServiceImpl implements FirebaseAuthService {
+  final FirebaseAuth firebaseAuth;
 
-  FirebaseAuthDataSourceImpl(this._firebaseAuth);
+  FirebaseAuthServiceImpl(this.firebaseAuth);
 
   @override
   Future<UserModel> signUp({
@@ -20,7 +20,7 @@ class FirebaseAuthDataSourceImpl implements FirebaseAuthService {
     required String password,
   }) async {
     try {
-      final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+      final userCredential = await firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -31,7 +31,7 @@ class FirebaseAuthDataSourceImpl implements FirebaseAuthService {
 
       return UserModel.fromFirebaseUser(userCredential.user!);
     } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+      throw handleAuthException(e);
     }
   }
 
@@ -41,7 +41,7 @@ class FirebaseAuthDataSourceImpl implements FirebaseAuthService {
     required String password,
   }) async {
     try {
-      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+      final userCredential = await firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -52,23 +52,23 @@ class FirebaseAuthDataSourceImpl implements FirebaseAuthService {
 
       return UserModel.fromFirebaseUser(userCredential.user!);
     } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+      throw handleAuthException(e);
     }
   }
 
   @override
   Future<void> logout() async {
     try {
-      await _firebaseAuth.signOut();
+      await firebaseAuth.signOut();
     } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+      throw handleAuthException(e);
     }
   }
 
   @override
   Future<UserModel?> getCurrentUser() async {
     try {
-      final user = _firebaseAuth.currentUser;
+      final user = firebaseAuth.currentUser;
       if (user == null) return null;
       return UserModel.fromFirebaseUser(user);
     } catch (e) {
@@ -78,13 +78,13 @@ class FirebaseAuthDataSourceImpl implements FirebaseAuthService {
 
   @override
   Stream<UserModel?> get authStateChanges {
-    return _firebaseAuth.authStateChanges().map((user) {
+    return firebaseAuth.authStateChanges().map((user) {
       if (user == null) return null;
       return UserModel.fromFirebaseUser(user);
     });
   }
 
-  String _handleAuthException(FirebaseAuthException e) {
+  String handleAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'weak-password':
         return 'The password provided is too weak';

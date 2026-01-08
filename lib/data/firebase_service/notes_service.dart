@@ -18,19 +18,19 @@ abstract class FirebaseNotesService {
   Future<void> deleteNote(String id);
 }
 
-class FirebaseNotesDataSourceImpl implements FirebaseNotesService {
-  final FirebaseFirestore _firestore;
-  final Uuid _uuid;
+class FirebaseNotesServiceImpl implements FirebaseNotesService {
+  final FirebaseFirestore firestore;
+  final Uuid uuid;
 
-  FirebaseNotesDataSourceImpl(this._firestore, this._uuid);
+  FirebaseNotesServiceImpl(this.firestore, this.uuid);
 
-  String get _collection => 'notes';
+  String get collection => 'notes';
 
   @override
   Stream<List<NoteModel>> getNotes(String userId) {
     try {
-      return _firestore
-          .collection(_collection)
+      return firestore
+          .collection(collection)
           .where('userId', isEqualTo: userId)
           .orderBy('updatedAt', descending: true)
           .snapshots()
@@ -52,7 +52,7 @@ class FirebaseNotesDataSourceImpl implements FirebaseNotesService {
   }) async {
     try {
       final now = DateTime.now();
-      final id = _uuid.v4();
+      final id = uuid.v4();
 
       final note = NoteModel(
         id: id,
@@ -63,7 +63,7 @@ class FirebaseNotesDataSourceImpl implements FirebaseNotesService {
         updatedAt: now,
       );
 
-      await _firestore.collection(_collection).doc(id).set(note.toFirestore());
+      await firestore.collection(collection).doc(id).set(note.toFirestore());
 
       return note;
     } on FirebaseException catch (e) {
@@ -78,7 +78,7 @@ class FirebaseNotesDataSourceImpl implements FirebaseNotesService {
     required String content,
   }) async {
     try {
-      final docRef = _firestore.collection(_collection).doc(id);
+      final docRef = firestore.collection(collection).doc(id);
       final doc = await docRef.get();
 
       if (!doc.exists) {
@@ -108,7 +108,7 @@ class FirebaseNotesDataSourceImpl implements FirebaseNotesService {
   @override
   Future<void> deleteNote(String id) async {
     try {
-      await _firestore.collection(_collection).doc(id).delete();
+      await firestore.collection(collection).doc(id).delete();
     } on FirebaseException catch (e) {
       throw Exception('Failed to delete note: ${e.message}');
     }

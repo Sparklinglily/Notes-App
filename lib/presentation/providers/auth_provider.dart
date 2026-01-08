@@ -15,14 +15,14 @@ final firebaseAuthProvider = Provider<firebase_auth.FirebaseAuth>((ref) {
   return firebase_auth.FirebaseAuth.instance;
 });
 
-final firebaseAuthDataSourceProvider = Provider<FirebaseAuthService>((ref) {
+final firebaseAuthServiceProvider = Provider<FirebaseAuthService>((ref) {
   final firebaseAuth = ref.watch(firebaseAuthProvider);
-  return FirebaseAuthDataSourceImpl(firebaseAuth);
+  return FirebaseAuthServiceImpl(firebaseAuth);
 });
 
 final authRepositoryProvider = Provider((ref) {
-  final dataSource = ref.watch(firebaseAuthDataSourceProvider);
-  return AuthRepositoryImpl(dataSource);
+  final fbDataSource = ref.watch(firebaseAuthServiceProvider);
+  return AuthRepositoryImpl(fbDataSource);
 });
 
 // Use cases
@@ -71,17 +71,17 @@ class AuthState {
 
 // Auth view model
 class AuthViewModel extends StateNotifier<AuthState> {
-  final LoginUseCase _loginUseCase;
-  final SignUpUseCase _signUpUseCase;
-  final LogoutUseCase _logoutUseCase;
+  final LoginUseCase loginUseCase;
+  final SignUpUseCase signUpUseCase;
+  final LogoutUseCase logoutUseCase;
 
-  AuthViewModel(this._loginUseCase, this._signUpUseCase, this._logoutUseCase)
+  AuthViewModel(this.loginUseCase, this.signUpUseCase, this.logoutUseCase)
     : super(AuthState());
 
   Future<bool> login(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
 
-    final result = await _loginUseCase(email: email, password: password);
+    final result = await loginUseCase(email: email, password: password);
 
     return result.fold(
       (failure) {
@@ -98,7 +98,7 @@ class AuthViewModel extends StateNotifier<AuthState> {
   Future<bool> signUp(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
 
-    final result = await _signUpUseCase(email: email, password: password);
+    final result = await signUpUseCase(email: email, password: password);
 
     return result.fold(
       (failure) {
@@ -115,7 +115,7 @@ class AuthViewModel extends StateNotifier<AuthState> {
   Future<void> logout() async {
     state = state.copyWith(isLoading: true);
 
-    final result = await _logoutUseCase();
+    final result = await logoutUseCase();
 
     result.fold(
       (failure) {
